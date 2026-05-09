@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BONICODE AI | CORE</title>
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #0a0a0a;
+            --border: #1a1a1a;
+            --accent: #ffffff;
+            --accent-muted: #888888;
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        body { 
+            background: var(--bg-base); 
+            color: var(--accent); 
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+        }
+
+        /* Sidebar - Industrial Slate */
+        #sidebar { 
+            width: 280px; 
+            background: var(--bg-base); 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 32px 24px;
+        }
+
+        @media (max-width: 768px) { #sidebar { display: none; } }
+
+        .brand { 
+            font-size: 0.85rem; 
+            font-weight: 900; 
+            letter-spacing: 4px;
+            color: var(--accent);
+            margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand::before { content: ''; width: 8px; height: 8px; background: var(--accent); display: inline-block; }
+
+        .nav-group { margin-bottom: 32px; }
+        .nav-label { font-size: 0.65rem; color: #444; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; }
+        
+        .nav-link {
+            padding: 10px 0;
+            cursor: pointer;
+            color: var(--accent-muted);
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover { color: var(--accent); }
+        .nav-link.active { color: var(--accent); font-weight: 600; }
+
+        /* Workspace Terminal */
+        #workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg-base); }
+
+        #terminal-header { 
+            padding: 16px 24px; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--accent-muted);
+            font-family: var(--font-mono);
+        }
+
+        #log-container { 
+            flex: 1; 
+            padding: 40px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 32px;
+        }
+
+        .entry { max-width: 900px; line-height: 1.7; font-size: 0.9rem; }
+        .entry-label { font-family: var(--font-mono); font-size: 0.7rem; margin-bottom: 8px; color: #444; text-transform: uppercase; }
+        
+        .ai-text { color: var(--accent); }
+        .user-text { color: var(--accent-muted); }
+
+        /* Command Input */
+        #command-bar { 
+            padding: 40px; 
+            border-top: 1px solid var(--border);
+        }
+
+        .input-frame { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            display: flex; 
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 4px 4px 4px 20px;
+            transition: border 0.3s;
+        }
+
+        .input-frame:focus-within { border-color: #555; }
+
+        input { 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            color: var(--accent); 
+            outline: none; 
+            font-size: 0.95rem;
+            padding: 12px 0;
+            font-family: var(--font-mono);
+        }
+
+        button { 
+            background: var(--accent); 
+            color: var(--bg-base); 
+            border: none; 
+            padding: 12px 24px; 
+            font-weight: 800; 
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: #00ff00; margin-right: 8px; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="brand">BONICODE CORE</div>
+        
+        <div class="nav-group">
+            <span class="nav-label">Instruments</span>
+            <div class="nav-link active">Neural Bridge<span>[01]</span></div>
+            <div class="nav-link">Logic Engine<span>[02]</span></div>
+            <div class="nav-link">File System<span>[03]</span></div>
+        </div>
+
+        <div class="nav-group">
+            <span class="nav-label">Global Deploy</span>
+            <div class="nav-link">Active Links<span>0</span></div>
+            <div class="nav-link">Cloud Status<span>99%</span></div>
+        </div>
+
+        <div style="margin-top: auto; font-family: var(--font-mono); font-size: 0.6rem; color: #333;">
+            SYSTEM_V1.0.4_BETA<br>
+            ENCRYPTION: ACTIVE
+        </div>
+    </div>
+
+    <div id="workspace">
+        <div id="terminal-header">
+            <div><span class="dot"></span> AGENT_READY // LISTENING</div>
+            <div style="letter-spacing: 2px;">SESSION_7749G</div>
+        </div>
+
+        <div id="log-container">
+            <div class="entry">
+                <div class="entry-label">System Initialized</div>
+                <div class="ai-text">Welcome, operator. Bonicode AI is online. I am optimized for complex architecture and heavy deployments. State your requirements for the build.</div>
+            </div>
+        </div>
+
+        <div id="command-bar">
+            <div class="input-frame">
+                <input type="text" id="userInput" placeholder="EXECUTE BUILD SEQUENCE...">
+                <button id="sendBtn">Run</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sendBtn = document.getElementById('sendBtn');
+        const userInput = document.getElementById('userInput');
+        const log = document.getElementById('log-container');
+
+        function logEntry(role, text) {
+            const div = document.createElement('div');
+            div.className = 'entry';
+            div.innerHTML = `
+                <div class="entry-label">${role === 'agent' ? 'Bonicode_Agent' : 'Operator'}</div>
+                <div class="${role === 'agent' ? 'ai-text' : 'user-text'}">${text}</div>
+            `;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        sendBtn.onclick = () => {
+            if (!userInput.value) return;
+            logEntry('user', userInput.value);
+            userInput.value = '';
+            
+            setTimeout(() => {
+                logEntry('agent', "Acknowledged. Initializing build sub-routines... Scanning infrastructure... Ready for implementation.");
+            }, 600);
+        };
+    </script>
+</body>
+</html>
