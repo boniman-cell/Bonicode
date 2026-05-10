@@ -4,25 +4,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BONICODE</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
-        #chat { height: 70vh; overflow-y: auto; border-bottom: 1px solid #333; margin-bottom: 20px; }
-        .msg { margin-bottom: 15px; line-height: 1.5; font-size: 14px; }
-        .op { color: #888; font-weight: bold; }
-        .ai { color: #fff; }
-        #box { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 8px; outline: none; }
-        button { width: 100%; background: #fff; color: #000; border: none; padding: 15px; margin-top: 10px; border-radius: 8px; font-weight: bold; }
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        #chat { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+        .msg { margin-bottom: 15px; line-height: 1.6; font-size: 14px; border-left: 2px solid #222; padding-left: 12px; }
+        .label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #555; display: block; margin-bottom: 4px; }
+        #input-area { background: #000; padding: 20px 0; border-top: 1px solid #111; }
+        #box { width: 100%; background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 16px; border-radius: 8px; outline: none; box-sizing: border-box; }
+        button { width: 100%; background: #fff; color: #000; border: none; padding: 16px; margin-top: 10px; border-radius: 8px; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
     <div id="chat">
-        <div class="msg">System: Ready for command.</div>
+        <div class="msg"><span class="label">System</span>Neural Engine Ready.</div>
     </div>
-    <input type="text" id="box" placeholder="Type here...">
-    <button id="btn">RUN COMMAND</button>
+    <div id="input-area">
+        <input type="text" id="box" placeholder="TYPE COMMAND...">
+        <button id="btn">RUN ENGINE</button>
+    </div>
 
     <script>
-        // PASTE YOUR GSK_ KEY INSIDE THE QUOTES BELOW
-        const KEY = "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";
+        // 🔑 PASTE YOUR ENTIRE GSK_ KEY IN THE QUOTES BELOW
+        const API_KEY = "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";
 
         document.getElementById('btn').onclick = async () => {
             const input = document.getElementById('box');
@@ -30,23 +32,23 @@
             const val = input.value;
             if(!val) return;
 
-            chat.innerHTML += `<div class="msg"><span class="op">YOU:</span> ${val}</div>`;
+            chat.innerHTML += `<div class="msg"><span class="label">Operator</span>${val}</div>`;
             input.value = '';
 
             try {
                 const res = await fetch('https://groq.com', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: "llama-3.1-8b-instant",
                         messages: [{role: "user", content: val}]
                     })
                 });
                 const data = await res.json();
-                const reply = data.choices[0].message.content;
-                chat.innerHTML += `<div class="msg"><span class="ai">AI:</span> ${reply}</div>`;
+                const reply = data.choices.message.content;
+                chat.innerHTML += `<div class="msg"><span class="label" style="color:#fff">Bonicode_Agent</span>${reply}</div>`;
             } catch(e) {
-                chat.innerHTML += `<div class="msg" style="color:red">ERROR: Bridge Failed. Check Key.</div>`;
+                chat.innerHTML += `<div class="msg" style="color:red">ERROR: Bridge Failed. Re-check API Key.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         };
