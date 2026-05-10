@@ -1,76 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BONICODE AI | CORE</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#050505">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link href="https://googleapis.com" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BONICODE</title>
     <style>
-        :root { --bg: #000; --sidebar: #0a0a0a; --border: #1a1a1a; --accent: #ffffff; --glitch: #00ff00; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100dvh; margin: 0; padding: 0; background: var(--bg); color: var(--accent); font-family: 'Inter', sans-serif; overflow: hidden; }
-        #app-shell { display: grid; grid-template-columns: 260px 1fr; height: 100%; }
-        @media (max-width: 768px) { #app-shell { grid-template-columns: 1fr; } #sidebar { display: none; } }
-        #sidebar { background: var(--sidebar); border-right: 1px solid var(--border); padding: 32px 20px; }
-        .logo-area { font-weight: 900; letter-spacing: 4px; font-size: 0.8rem; margin-bottom: 48px; color: var(--glitch); }
-        #main-stage { display: flex; flex-direction: column; height: 100%; position: relative; }
-        #thinking-bar { height: 2px; width: 0%; background: var(--glitch); position: absolute; top: 60px; left: 0; transition: width 0.3s; z-index: 1000; }
-        @keyframes loadingMove { 0% { left: -40%; width: 40%; } 100% { left: 100%; width: 40%; } }
-        .thinking-active { animation: loadingMove 1.5s infinite linear; box-shadow: 0 0 10px var(--glitch); }
-        .page { flex: 1; overflow-y: auto; display: none; padding: 24px; padding-bottom: 180px; }
-        .page.active { display: flex; flex-direction: column; }
-        #chat-log { width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
-        .entry { border-left: 1px solid var(--border); padding-left: 24px; margin-bottom: 10px; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
-        .role { font-size: 0.65rem; font-weight: 800; color: #444; text-transform: uppercase; margin-bottom: 8px; }
-        .text { line-height: 1.7; font-size: 0.9rem; color: #ccc; }
-        #input-dock { position: fixed; bottom: 32px; left: 16px; right: 16px; z-index: 200; }
-        .input-wrap { max-width: 800px; margin: 0 auto; background: rgba(10,10,10,0.8); border: 1px solid var(--border); border-radius: 20px; padding: 8px; display: flex; backdrop-filter: blur(25px); }
-        input { flex: 1; background: transparent; border: none; color: white; padding: 12px 16px; outline: none; font-size: 1rem; }
-        .run-btn { background: white; color: black; border: none; padding: 12px 28px; border-radius: 14px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; }
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        #chat { height: 70vh; overflow-y: auto; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .msg { margin-bottom: 15px; line-height: 1.5; font-size: 14px; }
+        .op { color: #888; font-weight: bold; }
+        .ai { color: #fff; }
+        #box { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 8px; outline: none; }
+        button { width: 100%; background: #fff; color: #000; border: none; padding: 15px; margin-top: 10px; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="app-shell">
-        <aside id="sidebar"><div class="logo-area">BONICODE CORE</div></aside>
-        <main id="main-stage">
-            <div id="thinking-bar"></div>
-            <header style="height:60px; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; font-size:0.7rem; font-weight:800; letter-spacing:2px; color:#444;">NEURAL_ENGINE // STABLE</header>
-            <div id="page-agent" class="page active"><div id="chat-log"><div class="entry"><div class="role">System</div><div class="text">Neural link ready. State requirements.</div></div></div></div>
-            <div id="input-dock"><div class="input-wrap"><input type="text" id="userInput" placeholder="COMMAND AGENT..."><button class="run-btn" id="sendBtn">Run</button></div></div>
-        </main>
+    <div id="chat">
+        <div class="msg">System: Ready for command.</div>
     </div>
-    <script>
-        /* 🛡️ SECURITY MOVE: This placeholder connects to Vercel's secret box */
-        const API_KEY = "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"; 
+    <input type="text" id="box" placeholder="Type here...">
+    <button id="btn">RUN COMMAND</button>
 
-        document.getElementById('sendBtn').onclick = async () => {
-            const val = document.getElementById('userInput').value;
+    <script>
+        // PASTE YOUR GSK_ KEY INSIDE THE QUOTES BELOW
+        const KEY = "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";
+
+        document.getElementById('btn').onclick = async () => {
+            const input = document.getElementById('box');
+            const chat = document.getElementById('chat');
+            const val = input.value;
             if(!val) return;
-            const thinkBar = document.getElementById('thinking-bar');
-            thinkBar.classList.add('thinking-active');
-            const log = document.getElementById('chat-log');
-            log.innerHTML += `<div class="entry"><div class="role">Operator</div><div class="text">${val}</div></div>`;
-            document.getElementById('userInput').value = '';
+
+            chat.innerHTML += `<div class="msg"><span class="op">YOU:</span> ${val}</div>`;
+            input.value = '';
 
             try {
                 const res = await fetch('https://groq.com', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: "llama3-8b-8192", messages: [{role: "user", content: val}] })
+                    headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant",
+                        messages: [{role: "user", content: val}]
+                    })
                 });
                 const data = await res.json();
-                const reply = data.choices.message.content;
-                log.innerHTML += `<div class="entry"><div class="role">Bonicode_Agent</div><div class="text">${reply}</div></div>`;
+                const reply = data.choices[0].message.content;
+                chat.innerHTML += `<div class="msg"><span class="ai">AI:</span> ${reply}</div>`;
             } catch(e) {
-                log.innerHTML += `<div class="entry"><div class="role">Error</div><div class="text">Neural Bridge Failed. Check Vercel Settings.</div></div>`;
+                chat.innerHTML += `<div class="msg" style="color:red">ERROR: Bridge Failed. Check Key.</div>`;
             }
-            thinkBar.classList.remove('thinking-active');
-            document.getElementById('page-agent').scrollTop = document.getElementById('page-agent').scrollHeight;
+            chat.scrollTop = chat.scrollHeight;
         };
     </script>
 </body>
