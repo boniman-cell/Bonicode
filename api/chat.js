@@ -1,19 +1,19 @@
 export default async function handler(req, res) {
     try {
         if (req.method !== "POST") {
-            return res.status(405).json({ error: "Only POST allowed" });
+            return res.status(200).json({ reply: "Use POST method" });
         }
 
         const { message } = req.body || {};
 
         if (!message) {
-            return res.status(400).json({ error: "No message received" });
+            return res.status(200).json({ reply: "No message sent" });
         }
 
         const apiKey = process.env.GROQ_API_KEY;
 
         if (!apiKey) {
-            return res.status(500).json({ error: "Missing API key in Vercel" });
+            return res.status(200).json({ reply: "API key missing in Vercel" });
         }
 
         const response = await fetch(
@@ -27,14 +27,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({
                     model: "llama-3.1-8b-instant",
                     messages: [
-                        {
-                            role: "system",
-                            content: "You are Bonicode AI, a helpful coding assistant."
-                        },
-                        {
-                            role: "user",
-                            content: message
-                        }
+                        { role: "user", content: message }
                     ]
                 })
             }
@@ -42,23 +35,15 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // SAFE RESPONSE HANDLING
         const reply = data?.choices?.[0]?.message?.content;
 
-        if (!reply) {
-            return res.status(500).json({
-                error: "No reply from AI",
-                raw: data
-            });
-        }
-
         return res.status(200).json({
-            reply
+            reply: reply || "No AI response"
         });
 
     } catch (err) {
-        return res.status(500).json({
-            error: err.message
+        return res.status(200).json({
+            reply: "Server error: " + err.message
         });
     }
 }
