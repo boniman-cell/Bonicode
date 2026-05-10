@@ -1,55 +1,204 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonicode Agent Pro</title>
 
-    <style>
-        body { font-family: Arial; background:#111; color:#fff; }
-        #chat { height:80vh; overflow-y:auto; padding:10px; }
-        .msg { margin:10px 0; padding:10px; background:#222; border-radius:8px; }
-        .label { color:#00ffcc; font-weight:bold; display:block; margin-bottom:5px; }
-        #box { width:75%; padding:10px; }
-        #btn { padding:10px; }
-    </style>
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f0f0f;
+    color: white;
+}
+
+header {
+    background: #1c1c1c;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#chat {
+    height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.msg {
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 10px;
+    max-width: 80%;
+    position: relative;
+}
+
+.user {
+    background: #2d6cff;
+    margin-left: auto;
+}
+
+.ai {
+    background: #2a2a2a;
+    margin-right: auto;
+}
+
+.actions {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+#typing {
+    font-size: 12px;
+    opacity: 0.6;
+    padding-left: 10px;
+}
+
+#inputBox {
+    display: flex;
+    padding: 10px;
+    background: #1c1c1c;
+}
+
+#box {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    margin-left: 5px;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#send { background: #00c26f; color: white; }
+#mic { background: #444; color: white; }
+#clear { background: #aa3333; color: white; }
+</style>
 </head>
 
 <body>
 
-<div id="chat"></div>
+<header>Bonicode AI Agent Pro 🤖</header>
 
-<input id="box" placeholder="Type message..." />
-<button id="btn">Send</button>
+<div id="chat"></div>
+<div id="typing"></div>
+
+<div id="inputBox">
+    <input id="box" placeholder="Ask anything..." />
+    <button id="mic">🎤</button>
+    <button id="send">Send</button>
+    <button id="clear">Clear</button>
+</div>
 
 <script>
-document.getElementById('btn').onclick = async () => {
-    const input = document.getElementById('box');
-    const chat = document.getElementById('chat');
-    const val = input.value;
 
-    if (!val) return;
+const chat = document.getElementById('chat');
+const typing = document.getElementById('typing');
 
-    chat.innerHTML += `<div class="msg"><span class="label">You</span>${val}</div>`;
-    input.value = '';
+let memory = JSON.parse(localStorage.getItem("memory")) || [];
 
-    const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: val })
-    });
+function saveMemory() {
+    localStorage.setItem("memory", JSON.stringify(memory));
+}
 
-    const data = await res.json();
+function addMsg(text, type) {
+    const id = Date.now();
 
     chat.innerHTML += `
-        <div class="msg">
-            <span class="label">AI</span>
-            ${data.reply || data.error}
+        <div class="msg ${type}" id="${id}">
+            ${text}
+            <div class="actions" onclick="copyText('${id}')">Copy</div>
         </div>
     `;
 
     chat.scrollTop = chat.scrollHeight;
+}
+
+function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+}
+
+// 🔊 speak AI
+function speak(text) {
+    const s = new SpeechSynthesisUtterance(text);
+    s.lang = "en-US";
+    window.speechSynthesis.speak(s);
+}
+
+// 🎤 voice input
+document.getElementById('mic').onclick = () => {
+    const r = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    r.lang = "en-US";
+
+    r.onresult = (e) => {
+        document.getElementById('box').value = e.results[0][0].transcript;
+    };
+
+    r.start();
 };
+
+// 🧠 clear chat
+document.getElementById('clear').onclick = () => {
+    chat.innerHTML = "";
+    memory = [];
+    saveMemory();
+};
+
+document.getElementById('send').onclick = async () => {
+    const input = document.getElementById('box');
+    const message = input.value;
+    if (!message) return;
+
+    addMsg("You: " + message, "user");
+
+    memory.push({ role: "user", content: message });
+    saveMemory();
+
+    input.value = "";
+    typing.innerText = "AI thinking... 🤖";
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, memory })
+        });
+
+        const data = await res.json();
+
+        const reply = data.reply || "No response";
+
+        memory.push({ role: "assistant", content: reply });
+        saveMemory();
+
+        typing.innerText = "";
+
+        addMsg("AI: " + reply, "ai");
+
+        speak(reply);
+
+    } catch (e) {
+        typing.innerText = "";
+        addMsg("Error: " + e.message, "ai");
+    }
+};
+
+// load old memory
+window.onload = () => {
+    memory.forEach(m => {
+        addMsg((m.role === "user" ? "You: " : "AI: ") + m.content, m.role === "user" ? "user" : "ai");
+    });
+};
+
 </script>
-<!-- test deploy -->
+
 </body>
 </html>
