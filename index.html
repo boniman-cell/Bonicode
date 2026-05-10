@@ -104,16 +104,16 @@
             
             try {
                 // CORRECT NEURAL BRIDGE URL
-                const res = await fetch('https://groq.com', {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
+                        model: "llama3-8b-8192", // High-performance production model
                         messages: [{ role: "user", content: val }]
                     })
                 });
                 const data = await res.json();
-                const reply = data.choices[0].message.content;
+                const reply = data.choices.message.content;
                 log.innerHTML += `<div class="entry"><div class="role">Bonicode_Agent</div><div class="text">${reply}</div></div>`;
             } catch(e) {
                 log.innerHTML += `<div class="entry"><div class="role">Error</div><div class="text">Neural Bridge Failed. Check API Key.</div></div>`;
