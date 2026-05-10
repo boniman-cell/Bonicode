@@ -2,75 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BONICODE AI | CORE</title>
+    
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#050505">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://googleapis.com" rel="stylesheet">
+
     <style>
-        :root { --bg: #050505; --sidebar: #0a0a0a; --border: #1a1a1a; --accent: #ffffff; --text-dim: #888; }
+        :root { --bg: #000000; --sidebar: #0a0a0a; --border: #1a1a1a; --accent: #ffffff; --text-dim: #888; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--accent); font-family: 'Inter', sans-serif; overflow: hidden; }
-        #app-shell { display: grid; grid-template-columns: 260px 1fr; height: 100vh; }
+        
+        /* Modern Dynamic Viewport to fix the "half-cut" mobile issue */
+        html, body { height: 100dvh; margin: 0; padding: 0; background: var(--bg); color: var(--accent); font-family: 'Inter', sans-serif; overflow: hidden; }
+
+        #app-shell { display: grid; grid-template-columns: 260px 1fr; height: 100%; }
         @media (max-width: 768px) { #app-shell { grid-template-columns: 1fr; } #sidebar { display: none; } }
+
         #sidebar { background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 20px; }
         .logo-area { font-weight: 800; font-size: 1rem; letter-spacing: 2px; margin-bottom: 48px; display: flex; align-items: center; gap: 10px; }
         .logo-box { width: 12px; height: 12px; background: white; }
-        .nav-section { margin-bottom: 32px; }
-        .nav-label { font-size: 0.65rem; color: #444; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; display: block; }
-        .nav-btn { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-dim); font-size: 0.85rem; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
-        .nav-btn:hover { background: #111; color: white; }
+
+        .nav-btn { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-dim); font-size: 0.85rem; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; }
         .nav-btn.active { background: #161616; color: white; border: 1px solid var(--border); }
+
         #main-stage { display: flex; flex-direction: column; height: 100%; position: relative; }
-        #stage-header { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; font-size: 0.8rem; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); color: var(--text-dim); }
-        .page { flex: 1; overflow-y: auto; display: none; padding: 40px; animation: fadeIn 0.3s ease; }
+        #stage-header { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; font-size: 0.8rem; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 10; }
+
+        /* The scrolling workspace */
+        .page { flex: 1; overflow-y: auto; display: none; padding: 40px; padding-bottom: 160px; scroll-behavior: smooth; }
         .page.active { display: flex; flex-direction: column; }
-        #chat-log { flex: 1; display: flex; flex-direction: column; gap: 32px; max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 120px; }
+
+        #chat-log { width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
         .entry { border-left: 1px solid var(--border); padding-left: 24px; }
-        .role { font-size: 0.65rem; font-weight: 800; color: #444; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
+        .role { font-size: 0.65rem; font-weight: 800; color: #444; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
         .text { line-height: 1.7; font-size: 0.9rem; color: #ccc; }
-        #input-dock { position: absolute; bottom: 32px; left: 32px; right: 32px; }
-        .input-wrap { max-width: 800px; margin: 0 auto; background: #0a0a0a; border: 1px solid var(--border); border-radius: 12px; padding: 6px; display: flex; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
-        input { flex: 1; background: transparent; border: none; color: white; padding: 12px 16px; outline: none; font-size: 0.95rem; }
-        .run-btn { background: white; color: black; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Floating Pro Command Dock */
+        #input-dock { position: fixed; bottom: 32px; left: 24px; right: 24px; z-index: 100; }
+        .input-wrap { max-width: 800px; margin: 0 auto; background: rgba(15,15,15,0.8); border: 1px solid var(--border); border-radius: 16px; padding: 8px; display: flex; backdrop-filter: blur(30px); box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+        input { flex: 1; background: transparent; border: none; color: white; padding: 12px 16px; outline: none; font-size: 1rem; }
+        .run-btn { background: white; color: black; border: none; padding: 12px 28px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+
+        .status-dot { width: 6px; height: 6px; background: #00ff00; border-radius: 50%; box-shadow: 0 0 10px #00ff00; }
     </style>
 </head>
 <body>
     <div id="app-shell">
         <aside id="sidebar">
             <div class="logo-area"><div class="logo-box"></div> BONICODE AI</div>
-            <div class="nav-section">
-                <span class="nav-label">Instruments</span>
-                <div class="nav-btn active" onclick="showPage('agent', this)">Neural Agent</div>
-                <div class="nav-btn" onclick="showPage('files', this)">File Explorer</div>
-                <div class="nav-btn" onclick="showPage('deploy', this)">Cloud Deploy</div>
-            </div>
-            <div style="margin-top: auto; font-size: 0.65rem; color: #333;">SYSTEM_STABLE_V1.0</div>
+            <div class="nav-btn active" onclick="showPage('agent', this)">Neural Agent</div>
+            <div class="nav-btn" onclick="showPage('files', this)">File Explorer</div>
+            <div class="nav-btn" onclick="showPage('deploy', this)">Cloud Deploy</div>
         </aside>
+
         <main id="main-stage">
             <header id="stage-header">
                 <span id="page-title">NEURAL_AGENT // CORE</span>
-                <div style="display: flex; align-items: center; gap: 8px;"><div style="width:6px;height:6px;background:#00ff00;border-radius:50%;"></div>LIVE_READY</div>
+                <div style="display: flex; align-items: center; gap: 8px;"><div class="status-dot"></div> LIVE_READY</div>
             </header>
-            <div id="page-agent" class="page active"><div id="chat-log"><div class="entry"><div class="role">System</div><div class="text">Neural link ready. State requirements.</div></div></div></div>
+
+            <div id="page-agent" class="page active">
+                <div id="chat-log">
+                    <div class="entry"><div class="role">System</div><div class="text">Neural link ready. State requirements.</div></div>
+                </div>
+            </div>
+
             <div id="page-files" class="page"><h3>FILES</h3><div id="file-list">📄 index.html</div></div>
-            <div id="page-deploy" class="page"><h3>DEPLOYMENTS</h3><div style="color:#444">NO_PROJECTS</div></div>
-            <div id="input-dock"><div class="input-wrap"><input type="text" id="userInput" placeholder="COMMAND..."><button class="run-btn" id="sendBtn">Run</button></div></div>
+            <div id="page-deploy" class="page"><h3>DEPLOYMENTS</h3><div style="color:#444">NO_ACTIVE_PROJECTS</div></div>
+
+            <div id="input-dock">
+                <div class="input-wrap">
+                    <input type="text" id="userInput" placeholder="EXECUTE_BUILD_COMMAND...">
+                    <button class="run-btn" id="sendBtn">Run</button>
+                </div>
+            </div>
         </main>
     </div>
+
     <script>
-        const API_KEY = "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"
-        let files = ['index.html'];
+        // STEP 1: PUT YOUR KEY INSIDE THE QUOTES BELOW
+        const API_KEY = "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";
 
         function showPage(p, btn) {
             document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
             document.getElementById('page-' + p).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('input-dock').style.display = p === 'agent' ? 'block' : 'none';
+            document.getElementById('input-dock').style.display = (p === 'agent') ? 'block' : 'none';
         }
 
         document.getElementById('sendBtn').onclick = async () => {
@@ -79,20 +101,24 @@
             const log = document.getElementById('chat-log');
             log.innerHTML += `<div class="entry"><div class="role">Operator</div><div class="text">${val}</div></div>`;
             document.getElementById('userInput').value = '';
-
+            
             try {
+                // CORRECT NEURAL BRIDGE URL
                 const res = await fetch('https://groq.com', {
                     method: 'POST',
-                    headers: {'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json'},
-                    body: JSON.stringify({model: "llama-3.1-8b-instant", messages: [{role: "user", content: val}]})
+                    headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant",
+                        messages: [{ role: "user", content: val }]
+                    })
                 });
                 const data = await res.json();
-                const reply = data.choices.message.content;
-                log.innerHTML += `<div class="entry"><div class="role">Agent</div><div class="text">${reply}</div></div>`;
+                const reply = data.choices[0].message.content;
+                log.innerHTML += `<div class="entry"><div class="role">Bonicode_Agent</div><div class="text">${reply}</div></div>`;
             } catch(e) {
-                log.innerHTML += `<div class="entry"><div class="role">Error</div><div class="text">Bridge Failed. Check Key.</div></div>`;
+                log.innerHTML += `<div class="entry"><div class="role">Error</div><div class="text">Neural Bridge Failed. Check API Key.</div></div>`;
             }
-            log.scrollTop = log.scrollHeight;
+            document.getElementById('page-agent').scrollTop = document.getElementById('page-agent').scrollHeight;
         };
     </script>
 </body>
