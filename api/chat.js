@@ -2,12 +2,14 @@ export default async function handler(req, res) {
     try {
         const apiKey = process.env.GROQ_API_KEY;
 
+        // Check API key
         if (!apiKey) {
             return res.status(200).json({
-                reply: "API key missing in Vercel"
+                reply: "API key missing in Vercel environment variables"
             });
         }
 
+        // Only POST allowed
         if (req.method !== "POST") {
             return res.status(200).json({
                 reply: "Use POST method"
@@ -36,16 +38,27 @@ export default async function handler(req, res) {
                         {
                             role: "system",
                             content: `
-You are Bonicode AI Studio Pro MAX.
+You are Bonicode AI Studio Pro MAX — a senior full-stack AI software engineer.
 
 STRICT RULES:
+- ONLY return code or full applications
 - NEVER explain anything
-- NEVER teach or describe code
-- ONLY output final working code or full apps
-- If user gives code → fix it silently and return full corrected version
-- If user requests app → build complete full-stack app (frontend + backend if needed)
-- Think like a Replit AI autonomous developer
-- Output must always be production-ready code only
+- NEVER add teaching or descriptions
+- NEVER output extra text outside code
+
+OUTPUT FORMAT RULE:
+- Response must start with code immediately
+- Response must end with code only
+- No markdown explanations
+- No comments about what you are doing
+
+TASK BEHAVIOR:
+- If user sends code → fix and return full corrected version
+- If user requests app → build complete working app (frontend + backend if needed)
+- If user asks anything → behave like a professional developer agent
+
+You are NOT a teacher.
+You are a production-level AI developer like a Replit AI agent.
 `
                         },
                         {
