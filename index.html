@@ -36,13 +36,15 @@ textarea {
     color: #00ff88;
     border: none;
     padding: 10px;
+    font-size: 14px;
 }
 
 button {
-    padding: 8px;
+    padding: 10px;
     margin-top: 10px;
     border: none;
     cursor: pointer;
+    font-weight: bold;
 }
 
 #run {
@@ -74,7 +76,7 @@ iframe {
 
 <div class="container">
 
-<!-- LEFT -->
+<!-- LEFT SIDE -->
 <div id="left">
 
 <h3>Code Editor</h3>
@@ -93,7 +95,7 @@ iframe {
 
 </div>
 
-<!-- RIGHT -->
+<!-- RIGHT SIDE -->
 <div id="right">
 <iframe id="frame"></iframe>
 </div>
@@ -102,13 +104,13 @@ iframe {
 
 <script>
 
-// RUN CODE
+// RUN BUTTON
 document.getElementById("run").onclick = () => {
     const code = document.getElementById("code").value;
     document.getElementById("frame").srcdoc = code;
 };
 
-// AI BUTTON (FIXED)
+// AI FIX BUTTON (CORRECT POST REQUEST)
 document.getElementById("ai").onclick = async () => {
 
     const code = document.getElementById("code").value;
